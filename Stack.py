@@ -44,4 +44,11 @@ class Stack:
 
     def get_name(self):
         return self.name
-
+    
+    def listify_stack_values(self):
+        pointer = self.top_node
+        value_list = []
+        while pointer:
+            value_list.append(pointer.get_value())
+            pointer = pointer.get_next_node()
+        return value_list
