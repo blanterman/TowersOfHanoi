@@ -29,42 +29,25 @@ class Ring:
 def draw_hanoi(pillar_contents):
     print("    _        _        _    ")
     print("   | |      | |      | |   ")
-    try:
-        print(pillar_contents[0][0].draw_ring(), end = "")
-    except (IndexError, TypeError):
-        print("   | |   ", end = "")
-    try:
-        print(pillar_contents[1][0].draw_ring(), end = "")
-    except (IndexError, TypeError):  
-        print("   | |   ", end = "")
-    try:
-        print(pillar_contents[2][0].draw_ring())
-    except (IndexError, TypeError):
-        print("   | |   ")
-    try:
-        print(pillar_contents[0][1].draw_ring(), end = "")
-    except (IndexError, TypeError):
-        print("   | |   ", end = "")
-    try:
-        print(pillar_contents[1][1].draw_ring(), end = "")
-    except (IndexError, TypeError):
-        print("   | |   ", end = "")
-    try:
-        print(pillar_contents[2][1].draw_ring())
-    except (IndexError, TypeError):
-        print("   | |   ")
-    try:
-        print(pillar_contents[0][2].draw_ring(), end = "")
-    except (IndexError, TypeError):
-        print("   | |   ", end = "")
-    try:
-        print(pillar_contents[1][2].draw_ring(), end = "")
-    except (IndexError, TypeError):
-        print("   | |   ", end = "")
-    try:
-        print(pillar_contents[2][2].draw_ring())
-    except (IndexError, TypeError):
-        print("   | |   ")
+    for pillar in pillar_contents:
+        if len(pillar) == 0:
+            pillar = [None, None, None]
+        else:
+            pillar.reverse()
+            while len(pillar) != 3:
+                pillar.append(None)
+            pillar.reverse()
+        
+    for i in range(3):
+        for j in range(3):
+            try:
+                if pillar_contents[j][i]:
+                    print(pillar_contents[j][i].draw_ring(), end = "" if j != 2 else "\n")
+                else:
+                    print("   | |   ", end = "" if j != 2 else "\n")
+            except IndexError:
+                print("   | |   ", end = "" if j != 2 else "\n")
+    print("////1////////2////////3////")
 
 def is_valid_move(source, destination):
     if source.is_empty():
@@ -113,8 +96,8 @@ update_view()
 play_game = True
 
 while play_game:
-    source = int(input("Select post 1, 2, or 3 with ring to move"))
-    destination = int(input("Where would you like to move the ring to?"))
+    source = int(input("Select post 1, 2, or 3 with ring to move. "))
+    destination = int(input("Where would you like to move the ring to? "))
     
     try:
         source_object = posts[source - 1]
