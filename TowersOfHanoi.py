@@ -9,45 +9,85 @@ posts = [post1, post2, post3]
 class Ring:
     def __init__(self, size):
         self.size = size
+    def __repr__(self):
+        return str(self.size)
     def get_size(self):
         return self.size
     def draw_ring(self):
         ring_drawing = ""
         num_dashes = self.size * 2 + 1
-        num_top_spaces = abs(self.size - 4)
-        num_bottom_spaces = abs(self.size - 3)
-        for i in range(num_bottom_spaces):
-            ring_drawing += " "
         ring_drawing += "|"
         for i in range(num_dashes):
             ring_drawing += "-"
         ring_drawing += "|"
-        for i in range(num_bottom_spaces):
-            ring_drawing += " "
         return ring_drawing
 
+def draw_top_of_posts():
+    row_of_text = ""
+    for post in posts:
+        for i in range(num_rings + 1):
+            row_of_text += " "
+        row_of_text += "_"
+        for i in range(num_rings + 1):
+            row_of_text += " "
+    print(row_of_text)
+    row_of_text = ""
+    for post in posts:
+        for i in range(num_rings):
+            row_of_text += " "
+        row_of_text += "| |"
+        for i in range(num_rings):
+            row_of_text += " "
+    print(row_of_text)
+
+def draw_base():
+    row_of_text = ""
+    for i in range(len(posts)):
+        for j in range(num_rings + 1):
+            row_of_text += "/"
+        row_of_text += str(i + 1)
+        for j in range(num_rings + 1):
+            row_of_text += "/"
+    print(row_of_text)
+
 def draw_hanoi(pillar_contents):
-    print("    _        _        _    ")
-    print("   | |      | |      | |   ")
+    draw_top_of_posts()
     for pillar in pillar_contents:
         if len(pillar) == 0:
-            pillar = [None, None, None]
+            for i in range(num_rings):
+                pillar.append(None)
         else:
             pillar.reverse()
-            while len(pillar) != 3:
+            while len(pillar) != num_rings:
                 pillar.append(None)
             pillar.reverse()
-        
-    for i in range(3):
-        for j in range(3):
+    for i in range(num_rings):
+        for j in range(len(posts)):
+            ring_text = ""
+            ring = pillar_contents[j][i]
             try:
-                if pillar_contents[j][i]:
-                    print(pillar_contents[j][i].draw_ring(), end = "" if j != 2 else "\n")
+                if ring:
+                    for k in range(num_rings - ring.get_size()):
+                        ring_text += " "
+                    ring_text += str(ring.draw_ring())
+                    for k in range(num_rings - ring.get_size()):
+                        ring_text += " "
+                    print(ring_text, end = "" if j != len(posts) - 1 else "\n")
                 else:
-                    print("   | |   ", end = "" if j != 2 else "\n")
+                    for k in range(num_rings):
+                        ring_text += " "
+                    ring_text += "| |"
+                    for k in range(num_rings):
+                        ring_text += " "
+                    print(ring_text, end = "" if j != len(posts) - 1 else "\n")
             except IndexError:
-                print("   | |   ", end = "" if j != 2 else "\n")
-    print("////1////////2////////3////")
+                for k in range(num_rings):
+                    ring_text += " "
+                ring_text += "| |"
+                for k in range(num_rings):
+                    ring_text += " "
+                print(ring_text, end = "" if j != len(posts) - 1 else "\n")
+    draw_base()
 
 def is_valid_move(source, destination):
     if source.is_empty():
@@ -68,46 +108,45 @@ def move_ring(source, destination):
 
 def victory(post3_list):
     try:
-        if len(post3_list) != 3:
+        if len(post3_list) != num_rings:
             return False
     except TypeError:
         return False
-    victory_sizes = [1, 2, 3]
-    for i in range(len(post3_list)):
-        print(str(victory_sizes[i]) + "->" + str(post3_list[i].get_size()))
-        if victory_sizes[i] != post3_list[i].get_size():
-            return False
     return True
 
 def update_view():
     post_contents = [post.listify_stack_values() for post in posts]
     draw_hanoi(post_contents)
 
-large_ring = Ring(3)
-medium_ring = Ring(2)
-small_ring = Ring(1)
-
-post1.push(large_ring)
-post1.push(medium_ring)
-post1.push(small_ring)
+num_rings = int(input("\nPlease input the number of rings that you would like "))
+for i in range(num_rings, 0, -1):
+    post1.push(Ring(i))
 
 update_view()
-
 play_game = True
+cont = True
 
 while play_game:
-    source = int(input("Select post 1, 2, or 3 with ring to move. "))
-    destination = int(input("Where would you like to move the ring to? "))
+    try:
+        source = int(input("Select post 1, 2, or 3 with ring to move. "))
+        destination = int(input("Where would you like to move the ring to? "))
+        cont = True
+    except (TypeError, ValueError):
+        cont = False
+        print("Input not valid")
     
     try:
         source_object = posts[source - 1]
         destination_object = posts[destination - 1]
-    except (IndexError, TypeError):
+        cont = True
+    except (NameError, IndexError, TypeError, ValueError):
+        cont = False
         print("Please make valid selections for your move")
     
-    move_ring(source_object, destination_object)
-    update_view()
-    if victory(post3.listify_stack_values()):
-        print("You won! Yay!")
-        play_game = False
+    if cont:
+        move_ring(source_object, destination_object)
+        update_view()
+        if victory(post3.listify_stack_values()):
+            print("You won! Yay!")
+            play_game = False
     
