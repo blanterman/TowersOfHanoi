@@ -1,19 +1,25 @@
 from Stack import Stack
 
-# This will implement a version of the game Towers of Hanoi
+# This game is an implementation of the game Towers of Hanoi
+# This game was developed as an exercise to learn about stacks, so the stack 
+# data structure is fully implemented
+
+# There are 3 posts that the rings can be on. A stack is initialized for each 
+# post to keep track of rings. 
 post1 = Stack("Post 1")
 post2 = Stack("Post 2")
 post3 = Stack("Post 3")
+
+# Put the post stacks in a list for ease of reading and manipulating
 posts = [post1, post2, post3]
 
+# Ring class that has size and ascii art drawing representation
 class Ring:
+    
     def __init__(self, size):
         self.size = size
+    
     def __repr__(self):
-        return str(self.size)
-    def get_size(self):
-        return self.size
-    def draw_ring(self):
         ring_drawing = ""
         num_dashes = self.size * 2 + 1
         ring_drawing += "|"
@@ -21,7 +27,14 @@ class Ring:
             ring_drawing += "-"
         ring_drawing += "|"
         return ring_drawing
+    
+    def get_size(self):
+        return self.size
 
+# Draws the top of the posts that will be visible no matter how many rings 
+# there are. Their spacing changes depending on the size of the larges ring
+# The size of the largest ring is equal to the global number of rings set by
+# the user.
 def draw_top_of_posts():
     row_of_text = ""
     for post in posts:
@@ -40,6 +53,11 @@ def draw_top_of_posts():
             row_of_text += " "
     print(row_of_text)
 
+# Draws the base of the posts that will be visible no matter how many rings 
+# there are. Each post is labled with a number. The spacing of the labels 
+# changes depending on the size of the larges ring
+# The size of the largest ring is equal to the global number of rings set by
+# the user.
 def draw_base():
     row_of_text = ""
     for i in range(len(posts)):
@@ -50,26 +68,34 @@ def draw_base():
             row_of_text += "/"
     print(row_of_text)
 
-def draw_hanoi(pillar_contents):
+
+# Ascii art printout of the current state of the posts with the rings.
+def draw_hanoi(post_contents):
+    
+    # First draw the tops of the posts
     draw_top_of_posts()
-    for pillar in pillar_contents:
-        if len(pillar) == 0:
+    
+    # Make all the post stacks the same size, filling empty slots with Nones 
+    for post in post_contents:
+        if len(post) == 0:
             for i in range(num_rings):
-                pillar.append(None)
+                post.append(None)
         else:
-            pillar.reverse()
-            while len(pillar) != num_rings:
-                pillar.append(None)
-            pillar.reverse()
+            post.reverse()
+            while len(post) != num_rings:
+                post.append(None)
+            post.reverse()
+            
+    # Next draw the rings or an empty post in every position of each post
     for i in range(num_rings):
         for j in range(len(posts)):
             ring_text = ""
-            ring = pillar_contents[j][i]
+            ring = post_contents[j][i]
             try:
                 if ring:
                     for k in range(num_rings - ring.get_size()):
                         ring_text += " "
-                    ring_text += str(ring.draw_ring())
+                    ring_text += str(ring)
                     for k in range(num_rings - ring.get_size()):
                         ring_text += " "
                     print(ring_text, end = "" if j != len(posts) - 1 else "\n")
@@ -87,8 +113,11 @@ def draw_hanoi(pillar_contents):
                 for k in range(num_rings):
                     ring_text += " "
                 print(ring_text, end = "" if j != len(posts) - 1 else "\n")
+    
+    # Finally, draw the base with the labels of the posts
     draw_base()
 
+# Checks the selected move to see if it is a valid move
 def is_valid_move(source, destination):
     if source.is_empty():
         print("Cannot select an empty post as source")
@@ -101,11 +130,13 @@ def is_valid_move(source, destination):
         print("Destination must be empty or have a larger ring than the source post")
         return False
 
+# Moves the ring from one post to another using pop and push
 def move_ring(source, destination):
     if is_valid_move(source, destination):
         ring_to_move = source.pop()
         destination.push(ring_to_move)
 
+# Checks to see if the current state of the game is a victory
 def victory(post3_list):
     try:
         if len(post3_list) != num_rings:
@@ -114,18 +145,24 @@ def victory(post3_list):
         return False
     return True
 
+# Updates the ascii drawing of the current state of the game
 def update_view():
     post_contents = [post.listify_stack_values() for post in posts]
     draw_hanoi(post_contents)
 
+# Initialize game variables
+play_game = True
+cont = True
+
+# Get the users input for the number of rings 
 num_rings = int(input("\nPlease input the number of rings that you would like "))
 for i in range(num_rings, 0, -1):
     post1.push(Ring(i))
 
+# Print the initial state of the game
 update_view()
-play_game = True
-cont = True
 
+# Game loop
 while play_game:
     try:
         source = int(input("Select post 1, 2, or 3 with ring to move. "))
