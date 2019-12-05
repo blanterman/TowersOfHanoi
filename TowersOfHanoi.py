@@ -153,9 +153,24 @@ def update_view():
 # Initialize game variables
 play_game = True
 cont = True
+valid_input = False
 
-# Get the users input for the number of rings 
-num_rings = int(input("\nPlease input the number of rings that you would like "))
+# Get the users input for the number of rings
+while not valid_input:
+    try:
+        valid_input = True
+        print("\n*************************************************************\
+               \n*                                                           *\
+               \n*              WELCOME TO THE TOWERS OF HANOI!              *\
+               \n*                                                           *\
+               \n*  PLEASE INPUT THE NUMBER OF RINGS YOU WISH TO PLAY WITH   *\
+               \n*                                                           *\
+               \n*************************************************************")
+        num_rings = int(input())
+    except ValueError:
+        valid_input = False
+        print("\nPlease enter a number.\n")
+
 for i in range(num_rings, 0, -1):
     post1.push(Ring(i))
 
@@ -184,6 +199,10 @@ while play_game:
         move_ring(source_object, destination_object)
         update_view()
         if victory(post3.listify_stack_values()):
-            print("You won! Yay!")
+            print("\n***************************************\
+                   \n*                                     *\
+                   \n*             VICTORY!                *\
+                   \n*                                     *\
+                   \n***************************************")
             play_game = False
     
